@@ -1,3 +1,19 @@
+<?php
+
+ini_set('display_errors', 1);
+    ini_set('display_startup_errors', 1);
+    error_reporting(E_ALL);
+    require_once "../config/Database.php";
+
+    $db = new Database();
+    $pdo = $db->connect();
+
+    $sql = "SELECT * FROM users";
+    $users = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
+
+    print_r ($users);
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
