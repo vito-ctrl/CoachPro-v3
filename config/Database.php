@@ -1,41 +1,39 @@
 <?php
-    require_once __DIR__ . '/../vendor/autoload.php';
-    use Dotenv\Dotenv;
-    
-    class Database {
-        private string $username;
-        private string $password;
-        private string $dbname;
-        private string $host;
 
-        public function __construct(){
-            $dotenv = Dotenv::createImmutable(__DIR__ . '/..');
-            $dotenv->load();
+class Database
+{
+    private string $host;
+    private string $port;
+    private string $dbname;
+    private string $username;
+    private string $password;
+    private ?PDO $pdo = null;
 
-            $this->username = $_ENV['USER_NAME'];
-            $this->password = $_ENV['PASS'];
-            $this->dbname = $_ENV['DB_NAME'];
-            $this->host = $_ENV['HOST'];
-        }
+    public function __construct(){
+        $env = parse_ini_file(__DIR__ . '/../.env');
 
-        public function connect(): PDO {
-            try {
-                return new PDO(
-                    "pgsql:host={$this->host};dbname={$this->dbname}",
-                    $this->username,
-                    $this->password,
-                    [
-                        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-                        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
-                    ]
-                );
-            } catch (PDOException $e) {
-                die("DB error: " . $e->getMessage());
-            }
-        }
+        $this->host     = $env['DB_HOST'];
+        $this->port     = $env['DB_PORT'];
+        $this->dbname   = $env['DB_NAME'];
+        $this->username = $env['DB_USER'];
+        $this->password = $env['DB_PASS'];
     }
 
-// $db = new Database();
-// $pdo = $db->connect();
+    public function connect(): PDO{
+        if ($this->pdo === null) {
+            $dsn = "pgsql:host={$this->host};port={$this->port};dbname={$this->dbname}";
 
-// echo "Connected successfully!";
+            $this->pdo = new PDO(
+                $dsn,
+                $this->username,
+                $this->password,
+                [
+                    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+                    PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC
+                ]
+            );
+        }
+
+        return $this->pdo;
+    }
+}

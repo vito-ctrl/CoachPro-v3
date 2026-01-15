@@ -12,6 +12,10 @@ ini_set('display_errors', 1);
     $users = $pdo->query($sql)->fetchAll(PDO::FETCH_ASSOC);
 
     print_r ($users);
+
+    header("Location: ../app/View/register.html");
+    // header("Location : ../app/View/register.html");
+    exit;
 ?>
 
 <!DOCTYPE html>
